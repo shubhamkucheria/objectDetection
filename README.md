@@ -1,6 +1,10 @@
 # web-application-for-self-trained-object-detection
 Web application for self trained object detection model
 
+![alt text](https://raw.githubusercontent.com/shubhamkucheria/objectDetection/master/path/to/client/img/header.jpg
+)
+
+
 #Tech Stack
 Front end - Angular
 Back end - NodeJS
