@@ -17,37 +17,6 @@ var Imgobj = mongoose.model('ihack', {
 
 mongoose.connect(database.localUrl);
 
-// function yoyo (res) {
-//      var imageFile = fs.readFileSync('./uploads/'+myFileName);
-//      var encoded = Buffer.from(imageFile).toString('base64');
-
-//      console.log(encoded);
-//     fs.unlinkSync('./uploads/'+myFileName);
-//  }
-// Convert the image data to a Buffer and base64 encode it.
-
-function find(label) {
-
-    Imgobj.find({labelAnnotations: {$elemMatch: {description: "cat", description: "laptop"}}}, function (err, todo) {
-        if (err) {
-            // res.send(err);
-            console.log(err);
-        }
-        console.log(todo);
-        // res.json(todo); // return all todo in JSON format
-    });
-}
-
-function getImgobjs(res) {
-    Imgobj.find(function (err, todo) {
-        if (err) {
-            res.send(err);
-        }
-        console.log(todo);
-        // res.json(todo); // return all todo in JSON format
-    });
-};
-
 function addImg(data, bytecode) {
     Imgobj.create({
         labelAnnotations : data.labelAnnotations,
@@ -146,16 +115,6 @@ function addImg(data, bytecode) {
                         
                         res.json({imgdata: imgdata, imgSearchData: imgSearchData}); // return all todo in JSON format
                     });
-                    // find.call(response)
-                    // res.json({result: {
-                    //     labelAnnotations : response.body.responses[0].labelAnnotations,
-                    //     bytecode: encoded,
-                    //     imagePropertiesAnnotation: {
-                    //         r: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.red,
-                    //         g: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.green,
-                    //         b: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.blue
-                    //     }
-                    // }});
                 });
                     });
     });
