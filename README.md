@@ -1,8 +1,7 @@
 # web-application-for-self-trained-object-detection
 Web application for self trained object detection model
 
-![alt text](https://raw.githubusercontent.com/shubhamkucheria/objectDetection/master/path/to/client/img/header.jpg
-)
+![alt text](https://github.com/shubhamkucheria/objectDetection/blob/master/client/img/header.jpg)
 
 
 #Tech Stack
