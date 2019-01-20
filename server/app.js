@@ -1,19 +1,15 @@
-    var express = require('express'); 
-    var app = express(); 
-    var bodyParser = require('body-parser');
-    var multer = require('multer');
-    var fs   = require('fs');
+var express = require('express'); 
+var app = express(); 
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var fs   = require('fs');
 
-    var myFileName;
-    var key = "AIzaSyBxFRHU5etlSSUGaSNm62Agv9Hn0gA_AR4";
-    var request = require('request');
-
-
-    // set up ==========================================================
+var myFileName;
+var key = "AIzaSyBxFRHU5etlSSUGaSNm62Agv9Hn0gA_AR4";
+var request = require('request');
 var mongoose = require('mongoose');                 // mongoose for mongodb
-                // set the port
 var database = require('./config/database');            // load the database config
-var Todo = mongoose.model('ihack', {
+var Imgobj = mongoose.model('ihack', {
     labelAnnotations : [{ description: String,  score: Number}],
     bytecode: String,
     imagePropertiesAnnotation: {r: Number, g: Number, b: Number}
@@ -21,23 +17,18 @@ var Todo = mongoose.model('ihack', {
 
 mongoose.connect(database.localUrl);
 
-function yoyo (res) {
-     var imageFile = fs.readFileSync('./uploads/'+myFileName);
-     var encoded = Buffer.from(imageFile).toString('base64');
+// function yoyo (res) {
+//      var imageFile = fs.readFileSync('./uploads/'+myFileName);
+//      var encoded = Buffer.from(imageFile).toString('base64');
 
-     console.log(encoded);
-    fs.unlinkSync('./uploads/'+myFileName);
- }
+//      console.log(encoded);
+//     fs.unlinkSync('./uploads/'+myFileName);
+//  }
 // Convert the image data to a Buffer and base64 encode it.
 
 function find(label) {
-    // find({}, { projection: { address: 0 } }).toArray(function(err, result) {
-    // if (err) throw err;
 
-
-// db.users.find({awards: {$elemMatch: {award:'National Medal', year:1975}}})
-
-    Todo.find({labelAnnotations: {$elemMatch: {description: "cat", description: "laptop"}}}, function (err, todo) {
+    Imgobj.find({labelAnnotations: {$elemMatch: {description: "cat", description: "laptop"}}}, function (err, todo) {
         if (err) {
             // res.send(err);
             console.log(err);
@@ -45,11 +36,10 @@ function find(label) {
         console.log(todo);
         // res.json(todo); // return all todo in JSON format
     });
-
 }
 
-function getTodos(res) {
-    Todo.find(function (err, todo) {
+function getImgobjs(res) {
+    Imgobj.find(function (err, todo) {
         if (err) {
             res.send(err);
         }
@@ -59,7 +49,7 @@ function getTodos(res) {
 };
 
 function addImg(data, bytecode) {
-    Todo.create({
+    Imgobj.create({
         labelAnnotations : data.labelAnnotations,
         bytecode: bytecode,
         imagePropertiesAnnotation: {
@@ -110,13 +100,10 @@ function addImg(data, bytecode) {
                  res.json({error_code:1,err_desc:err});
                  return;
             }
-            // getTodos();
-            // find('laptop');
-            // setTimeout(function(){
-                var imageFile = fs.readFileSync('./uploads/'+myFileName);
+            var imageFile = fs.readFileSync('./uploads/'+myFileName);
                  var encoded = Buffer.from(imageFile).toString('base64');
 
-                 // console.log(encoded);
+                 // to delete file from storage
                 // fs.unlinkSync('./uploads/'+myFileName);
                 var myJSONObject = {
                     "requests": [
@@ -139,23 +126,37 @@ function addImg(data, bytecode) {
                 }, function (error, response, body){
                     console.log(response.body.responses);
                     // addImg(response.body.responses[0], encoded);
-                    res.json({result: {
-                        labelAnnotations : response.body.responses[0].labelAnnotations,
-                        bytecode: encoded,
-                        imagePropertiesAnnotation: {
-                            r: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.red,
-                            g: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.green,
-                            b: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.blue
+                    var imgdata = {
+                            labelAnnotations : response.body.responses[0].labelAnnotations,
+                            bytecode: encoded,
+                            imagePropertiesAnnotation: {
+                                r: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.red,
+                                g: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.green,
+                                b: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.blue
+                            }
+                    };
+                    Imgobj.find({labelAnnotations: {$elemMatch: {description: imgdata.labelAnnotations[0].description}}}, function (err, imgSearchData) {
+                        if (err) {
+                            res.send(err);
+                            return;
                         }
-                    }});
+                        // if (!imgSearchData.length) {
+                            addImg(response.body.responses[0], encoded);    
+                        // }
+                        
+                        res.json({imgdata: imgdata, imgSearchData: imgSearchData}); // return all todo in JSON format
+                    });
+                    // find.call(response)
+                    // res.json({result: {
+                    //     labelAnnotations : response.body.responses[0].labelAnnotations,
+                    //     bytecode: encoded,
+                    //     imagePropertiesAnnotation: {
+                    //         r: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.red,
+                    //         g: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.green,
+                    //         b: response.body.responses[0].imagePropertiesAnnotation.dominantColors.colors[0].color.blue
+                    //     }
+                    // }});
                 });
-
-               
-                  // console.log(`statusCode: ${res.statusCode}`)
-                  // console.log(res);
-                  // res.json({error_code:0,err_desc:null});
-                
-            // }, 000);
                     });
     });
 
